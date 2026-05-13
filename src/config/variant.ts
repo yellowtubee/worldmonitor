@@ -37,5 +37,10 @@ export const SITE_VARIANT: string = (() => {
     return buildVariant;
   }
 
-  return 'full';
+  // Final fallback: respect the build-time variant set via VITE_VARIANT
+  // (e.g. `npm run build:geopol-jp` sets it to 'geopol-jp'). This makes
+  // deployments work on any Vercel auto-generated URL like
+  // `worldmonitor-geopol-jp.vercel.app` even before a custom subdomain is set.
+  // The hostname-prefix checks above still take priority when present.
+  return isKnownVariant(buildVariant) ? buildVariant : 'full';
 })();
