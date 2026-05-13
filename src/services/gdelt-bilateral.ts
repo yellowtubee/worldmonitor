@@ -64,7 +64,19 @@ export const BILATERAL_PAIRS: BilateralPair[] = [
   },
 ];
 
-const BASE = 'https://api.gdeltproject.org/api/v2/doc/doc';
+/**
+ * Endpoint selection:
+ *   Production (Vercel deploy): hit our own /api/gdelt-proxy Edge Function
+ *     (same-origin, no CORS, edge-cached). See api/gdelt-proxy.js.
+ *   Local dev (npm run dev:geopol-jp): the Edge Function isn't running,
+ *     so we fall back to public CORS proxies.
+ */
+const isLocalDev =
+  typeof location !== 'undefined' &&
+  (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+
+const BASE = '/api/gdelt-proxy';
+const DIRECT_GDELT = 'https://api.gdeltproject.org/api/v2/doc/doc';
 
 // Local cache: avoid hammering GDELT on every refresh.
 const CACHE_PREFIX = 'geopol-jp:gdelt-cache:';
@@ -93,23 +105,28 @@ function cacheSet<T>(key: string, value: T): void {
 }
 
 async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  // GDELT 2.0 Doc API is *nominally* CORS-friendly, but in practice browsers
-  // often block it depending on the query payload (e.g. long queries containing
-  // CJK characters). We try direct first, then transparently fall back to a
-  // public CORS proxy. The fallback adds a small latency hop but always works
-  // for read-only GET requests.
-  //
-  // Proxies in priority order. Both are free, no-auth, GET-only.
-  const proxies: ((u: string) => string)[] = [
-    (u) => u,                                                // direct
-    (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`, // primary fallback
-    (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, // secondary
-  ];
+  // Production path: same-origin Edge Function (no CORS issues).
+  if (!isLocalDev) {
+    const res = await fetch(url, { signal });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`GDELT proxy HTTP ${res.status}: ${text.slice(0, 200) || res.statusText}`);
+    }
+    return (await res.json()) as T;
+  }
 
+  // Local dev path: reconstruct the direct GDELT URL and route through public proxies.
+  const params = new URL(url, location.origin).searchParams;
+  const directUrl = `${DIRECT_GDELT}?${params.toString()}`;
+  const proxies: ((u: string) => string)[] = [
+    (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    (u) => u,
+  ];
   let lastErr: unknown = null;
   for (const wrap of proxies) {
     try {
-      const res = await fetch(wrap(url), { signal });
+      const res = await fetch(wrap(directUrl), { signal });
       if (!res.ok) {
         lastErr = new Error(`HTTP ${res.status}: ${res.statusText}`);
         continue;
@@ -121,7 +138,7 @@ async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
     }
   }
   throw new Error(
-    `GDELT fetch failed via all routes: ${(lastErr as Error)?.message ?? 'unknown'}`,
+    `GDELT fetch failed via all dev routes: ${(lastErr as Error)?.message ?? 'unknown'}`,
   );
 }
 
