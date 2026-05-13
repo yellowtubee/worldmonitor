@@ -95,10 +95,24 @@ export default async function handler(req) {
     }
 
     const body = await res.text();
+
+    // GDELT returns HTTP 200 with PLAIN TEXT body when the query has syntax
+    // errors (e.g. "Parentheses are unbalanced"). Detect this so the frontend
+    // gets a structured error instead of a JSON parse failure.
+    const contentType = res.headers.get('Content-Type') || '';
+    const looksLikeJson = body.trimStart().startsWith('{') || body.trimStart().startsWith('[');
+    if (!contentType.includes('json') && !looksLikeJson) {
+      return json(400, {
+        error: 'GDELT returned a non-JSON response (likely a query syntax error)',
+        upstreamMessage: body.slice(0, 500).trim(),
+        hint: 'Check the query parameter — GDELT Doc 2.0 has strict parsing rules around parentheses, quotes, and CJK characters.',
+      });
+    }
+
     return new Response(body, {
       status: 200,
       headers: {
-        'Content-Type': res.headers.get('Content-Type') || 'application/json',
+        'Content-Type': contentType.includes('json') ? contentType : 'application/json',
         // Edge cache: serve same params from CDN for 10min; SWR for another 20min
         'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
         ...CORS_HEADERS,

@@ -47,20 +47,25 @@ export interface BilateralPair {
 }
 
 export const BILATERAL_PAIRS: BilateralPair[] = [
+  // GDELT Doc 2.0 query syntax is finicky with nested parens, quotes, and CJK.
+  // We use plain ASCII keywords with minimal structure — GDELT auto-ANDs
+  // separate terms, which is exactly the bilateral semantics we want.
+  // GDELT's corpus is overwhelmingly English-language anyway, so dropping the
+  // CJK alternatives costs little signal.
   {
     id: 'JP-US',
     label: '日米 (Japan – United States)',
-    query: '(Japan AND ("United States" OR Washington OR "U.S.")) OR (日米 OR "日本 アメリカ" OR "日本 米国")',
+    query: 'Japan "United States"',
   },
   {
     id: 'JP-CN',
     label: '日中 (Japan – China)',
-    query: '(Japan AND (China OR Beijing OR PRC)) OR (日中 OR "日本 中国")',
+    query: 'Japan China',
   },
   {
     id: 'US-CN',
     label: '米中 (United States – China)',
-    query: '(("United States" OR Washington OR "U.S.") AND (China OR Beijing OR PRC)) OR (米中 OR "中美")',
+    query: '"United States" China',
   },
 ];
 
