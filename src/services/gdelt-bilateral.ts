@@ -84,8 +84,20 @@ const BASE = '/api/gdelt-proxy';
 const DIRECT_GDELT = 'https://api.gdeltproject.org/api/v2/doc/doc';
 
 // Local cache: avoid hammering GDELT on every refresh.
+// GDELT enforces 1 req/5sec — long TTL is essential so dev refreshes don't
+// re-fire 6 cold requests. Headlines change slowly anyway (7-day window).
 const CACHE_PREFIX = 'geopol-jp:gdelt-cache:';
-const CACHE_TTL_MS = 20 * 60 * 1000; // 20min — matches feeds refresh interval
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+function cacheHas(key: string): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    if (!raw) return false;
+    const { t } = JSON.parse(raw) as { v: unknown; t: number };
+    return Date.now() - t <= CACHE_TTL_MS;
+  } catch { return false; }
+}
 
 function cacheGet<T>(key: string): T | null {
   if (typeof localStorage === 'undefined') return null;
@@ -230,18 +242,89 @@ export function summarizeTone(samples: GdeltToneSample[]): { avg: number; slope:
   return { avg, slope };
 }
 
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(new DOMException('Aborted', 'AbortError'));
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(new DOMException('Aborted', 'AbortError'));
+    }, { once: true });
+  });
+}
+
+const GDELT_RATE_LIMIT_GAP_MS = 5500; // GDELT: 1 req per 5s. Add 500ms safety.
+
+export interface LoadAllPairsOptions {
+  signal?: AbortSignal;
+  timespan?: string;
+  /** Called whenever a pair finishes loading, so the UI can render progressively. */
+  onProgress?: (snapshot: PairSnapshot, index: number, total: number) => void;
+  /** Called whenever a sub-step starts (so UI can show "fetching X..."). */
+  onStep?: (message: string) => void;
+}
+
+/**
+ * Load all 3 pairs SERIALLY with rate-limit-aware gaps.
+ *
+ * GDELT enforces 1 req/5sec, and we need 6 calls (3 pairs × {articles, tone}).
+ * That's 30+ seconds minimum on a fully cold cache. We skip the gap when the
+ * next fetch will be served from cache, so subsequent loads are near-instant.
+ */
 export async function loadAllPairs(
-  signal?: AbortSignal,
-  timespan = '7d',
+  opts: LoadAllPairsOptions | AbortSignal = {},
+  legacyTimespan = '7d',
 ): Promise<PairSnapshot[]> {
-  return Promise.all(
-    BILATERAL_PAIRS.map(async (pair) => {
-      const [articles, tone] = await Promise.all([
-        fetchPairArticles(pair, { timespan, maxRecords: 15, signal }),
-        fetchPairToneTimeline(pair, { timespan, signal }),
-      ]);
-      const { avg, slope } = summarizeTone(tone);
-      return { pair, articles, tone, toneAvg: avg, toneSlope: slope };
-    }),
-  );
+  // Back-compat: old signature was (signal, timespan)
+  const options: LoadAllPairsOptions =
+    opts instanceof AbortSignal ? { signal: opts, timespan: legacyTimespan } : opts;
+  const timespan = options.timespan ?? '7d';
+  const signal = options.signal;
+
+  const results: PairSnapshot[] = [];
+  let madeNetworkCall = false;
+
+  // Helper: gate one fetch behind the rate-limit window if needed.
+  const guarded = async <T>(
+    cacheKey: string,
+    label: string,
+    fetcher: () => Promise<T>,
+  ): Promise<T> => {
+    const willHitNetwork = !cacheHas(cacheKey);
+    if (willHitNetwork && madeNetworkCall) {
+      options.onStep?.(`${label} — GDELT レート制限のため約${GDELT_RATE_LIMIT_GAP_MS / 1000}秒待機中…`);
+      await sleep(GDELT_RATE_LIMIT_GAP_MS, signal);
+    }
+    options.onStep?.(`${label} — 取得中…`);
+    const result = await fetcher();
+    if (willHitNetwork) madeNetworkCall = true;
+    return result;
+  };
+
+  for (let i = 0; i < BILATERAL_PAIRS.length; i++) {
+    const pair = BILATERAL_PAIRS[i]!;
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+
+    const idxLabel = `${pair.label} (${i + 1}/${BILATERAL_PAIRS.length})`;
+
+    const articles = await guarded(
+      `art:${pair.id}:${timespan}:15`,
+      `${idxLabel} 記事リスト`,
+      () => fetchPairArticles(pair, { timespan, maxRecords: 15, signal }),
+    );
+
+    const tone = await guarded(
+      `tone:${pair.id}:${timespan}`,
+      `${idxLabel} トーン時系列`,
+      () => fetchPairToneTimeline(pair, { timespan, signal }),
+    );
+
+    const { avg, slope } = summarizeTone(tone);
+    const snap: PairSnapshot = { pair, articles, tone, toneAvg: avg, toneSlope: slope };
+    results.push(snap);
+    options.onProgress?.(snap, i, BILATERAL_PAIRS.length);
+  }
+
+  options.onStep?.('');
+  return results;
 }

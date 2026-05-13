@@ -174,6 +174,7 @@ export class BilateralRelationsPanel extends Panel {
   private briefs: CachedBriefs = loadBriefCache();
   private chats: CachedChats = loadChatCache();
   private loading = false;
+  private loadingStep = '';
   private error: string | null = null;
   private generatingForPair: string | null = null;
   private chattingForPair: string | null = null;
@@ -208,16 +209,30 @@ export class BilateralRelationsPanel extends Panel {
     this.fetchAbort?.abort();
     this.fetchAbort = new AbortController();
     this.loading = true;
+    this.loadingStep = '';
     this.error = null;
+    this.snapshots = []; // Clear so progressive rendering shows from scratch
     this.render();
     try {
-      this.snapshots = await loadAllPairs(this.fetchAbort.signal);
+      this.snapshots = await loadAllPairs({
+        signal: this.fetchAbort.signal,
+        onProgress: (snap) => {
+          // Append as it arrives so the user sees each card pop in.
+          this.snapshots = [...this.snapshots, snap];
+          this.render();
+        },
+        onStep: (msg) => {
+          this.loadingStep = msg;
+          this.render();
+        },
+      });
       this.error = null;
     } catch (e) {
       if ((e as Error).name === 'AbortError') return;
       this.error = `GDELT データの取得に失敗しました: ${(e as Error).message}`;
     } finally {
       this.loading = false;
+      this.loadingStep = '';
       this.render();
     }
   }
@@ -326,7 +341,16 @@ export class BilateralRelationsPanel extends Panel {
 
   private render(): void {
     if (this.loading && this.snapshots.length === 0) {
-      this.setContent('<div class="bilateral-loading">GDELT データ取得中…</div>');
+      const step = this.loadingStep || 'GDELT データ取得中…';
+      this.setContent(`
+        <div class="bilateral-loading">
+          <div style="font-size:13px;color:#cbd6ff;margin-bottom:6px">${escapeHtml(step)}</div>
+          <div style="font-size:11px;color:#888;line-height:1.5">
+            GDELT は「5秒に1リクエスト」の制限があるため、初回ロードは最大30秒程度かかります。<br>
+            一度取得すると6時間ローカルキャッシュされます。
+          </div>
+        </div>
+      `);
       return;
     }
     if (this.error && this.snapshots.length === 0) {
@@ -391,6 +415,10 @@ export class BilateralRelationsPanel extends Panel {
             <button data-bilateral-action="refresh">↻ 更新</button>
           </div>
         </div>
+        ${this.loading && this.loadingStep ? `
+          <div style="padding:6px 10px;font-size:11px;color:#88aaff;border-bottom:1px solid #2a2a2a;background:#0c1424">
+            ⏳ ${escapeHtml(this.loadingStep)}
+          </div>` : ''}
         <div class="bilateral-grid">${cards}</div>
       </div>`;
     this.setContent(html);
