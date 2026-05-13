@@ -1327,6 +1327,14 @@ export class PanelLayoutManager implements AppModule {
 
     this.createPanel('insights', () => new InsightsPanel());
 
+    // geopol-jp variant: bilateral relations panel (JP-US / JP-CN / US-CN)
+    // Lazy-loaded so it only ships in the geopol-jp bundle.
+    if (SITE_VARIANT === 'geopol-jp') {
+      this.lazyPanel('bilateral-relations', () =>
+        import('@/components/BilateralRelationsPanel').then(m => new m.BilateralRelationsPanel()),
+      );
+    }
+
     // Global Giving panel (all variants)
     this.lazyPanel('giving', () =>
       import('@/components/GivingPanel').then(m => new m.GivingPanel()),

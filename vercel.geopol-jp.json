@@ -1,0 +1,39 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_comment": [
+    "Geopol-JP variant — Vercel deployment config.",
+    "Use this as a SEPARATE Vercel project pointed at the same git repo.",
+    "Either replace the upstream vercel.json with this one in the geopol-jp",
+    "deployment project, OR keep both projects in the same repo and use",
+    "Vercel's per-project Build Command override.",
+    "",
+    "Build Command:    npm run build:geopol-jp",
+    "Output Directory: dist",
+    "Install Command:  npm install",
+    "",
+    "Then in Vercel project Settings → Domains, attach your chosen domain.",
+    "Recommended subdomains (hostname is what the variant detection keys off):",
+    "  - geopol-jp.<your-domain>",
+    "  - geopol.<your-domain>",
+    "(Both prefixes are recognized by src/config/variant.ts.)"
+  ],
+  "buildCommand": "npm run build:geopol-jp",
+  "outputDirectory": "dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/((?!api|assets|favico|map-styles|data|textures|sw\\.js|workbox-[a-f0-9]+\\.js|manifest\\.webmanifest|offline\\.html|robots\\.txt).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-WorldMonitor-Key" }
+      ]
+    }
+  ]
+}

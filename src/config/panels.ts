@@ -1085,6 +1085,172 @@ const ENERGY_MOBILE_MAP_LAYERS: MapLayers = {
 };
 
 // ============================================
+// GEOPOL-JP VARIANT (Japan-perspective geopolitical + energy)
+// ============================================
+// Maps to the 6 SHINJI requirements:
+//   ① Iran + tankers → hormuz-tracker, energy-disruptions, sanctions, middleeast
+//   ② Oil equities → energy-complex, oil-inventories, commodities
+//   ③ FX → markets (with USDJPY etc.), macro-signals
+//   ④⑤⑥ JP-US / JP-CN / US-CN → bilateral-relations (custom panel) + us/asia/cii
+const GEOPOLJP_PANELS: Record<string, PanelConfig> = {
+  map: { name: 'Geopolitical Map (JP)', enabled: true, priority: 1 },
+  'live-news': { name: 'Geopolitical Headlines', enabled: true, priority: 1 },
+  insights: { name: 'AI Insights', enabled: true, priority: 1 },
+  // The differentiator — bilateral relations panel using user Gemini key
+  'bilateral-relations': { name: '二国間関係 (日米・日中・米中)', enabled: true, priority: 1 },
+  // Country / regional news
+  us: { name: 'United States', enabled: true, priority: 1 },
+  asia: { name: 'Asia-Pacific', enabled: true, priority: 1 },
+  middleeast: { name: 'Middle East', enabled: true, priority: 1 },
+  // Composite signals
+  cii: { name: 'Country Instability', enabled: true, priority: 1 },
+  'gdelt-intel': { name: 'Live Intelligence', enabled: true, priority: 1 },
+  'strategic-posture': { name: 'AI Strategic Posture', enabled: true, priority: 1 },
+  'trade-policy': { name: 'Trade Policy', enabled: true, priority: 1 },
+  // ① Iran / oil tanker context
+  'hormuz-tracker': { name: 'Strait of Hormuz Tracker', enabled: true, priority: 1 },
+  'energy-disruptions': { name: 'Energy Disruptions Log', enabled: true, priority: 1 },
+  'energy-crisis': { name: 'Energy Crisis Policy Tracker', enabled: true, priority: 1 },
+  'sanctions-pressure': { name: 'Sanctions Pressure', enabled: true, priority: 1 },
+  'supply-chain': { name: 'Chokepoints & Routes', enabled: true, priority: 2 },
+  'ucdp-events': { name: 'UCDP Conflict Events', enabled: true, priority: 2 },
+  // ② Oil equities & commodities
+  'energy-complex': { name: 'Oil & Gas Complex', enabled: true, priority: 1 },
+  'oil-inventories': { name: 'Oil & Gas Inventories', enabled: true, priority: 1 },
+  commodities: { name: 'Energy Commodities (WTI, Brent, NatGas)', enabled: true, priority: 1 },
+  'fuel-prices': { name: 'Retail Fuel Prices', enabled: true, priority: 2 },
+  // ② + ③ Markets / FX
+  markets: { name: 'Markets & FX', enabled: true, priority: 1 },
+  'macro-signals': { name: 'Market Regime', enabled: true, priority: 2 },
+  'fear-greed': { name: 'Fear & Greed', enabled: true, priority: 2 },
+  // Tracking
+  monitors: { name: 'My Monitors', enabled: true, priority: 3 },
+  'world-clock': { name: 'World Clock', enabled: true, priority: 3 },
+};
+
+const GEOPOLJP_MAP_LAYERS: MapLayers = {
+  // Maritime + energy
+  ais: true,
+  liveTankers: true,
+  waterways: true,
+  tradeRoutes: true,
+  pipelines: true,
+  commodityPorts: true,
+  storageFacilities: true,
+  fuelShortages: true,
+  sanctions: true,
+  // Iran / conflict context
+  iranAttacks: true,
+  conflicts: true,
+  ucdpEvents: true,
+  gpsJamming: true,
+  hotspots: true,
+  // Asia-Pacific context
+  military: true,
+  bases: true,
+  flights: false,
+  cables: true,
+  // Environmental
+  natural: true,
+  weather: true,
+  fires: true,
+  climate: true,
+  outages: true,
+  cyberThreats: true,
+  // Overlays
+  ciiChoropleth: true,
+  minerals: true,
+  // Disabled
+  satellites: false,
+  nuclear: false,
+  irradiators: false,
+  economic: false,
+  datacenters: false,
+  protests: false,
+  spaceports: false,
+  displacement: false,
+  startupHubs: false,
+  cloudRegions: false,
+  accelerators: false,
+  techHQs: false,
+  techEvents: false,
+  stockExchanges: false,
+  financialCenters: false,
+  centralBanks: false,
+  commodityHubs: false,
+  gulfInvestments: false,
+  positiveEvents: false,
+  kindness: false,
+  happiness: false,
+  speciesRecovery: false,
+  renewableInstallations: false,
+  resilienceScore: false,
+  dayNight: false,
+  miningSites: false,
+  processingPlants: false,
+  webcams: false,
+  diseaseOutbreaks: false,
+};
+
+const GEOPOLJP_MOBILE_MAP_LAYERS: MapLayers = {
+  ais: false,
+  liveTankers: true,
+  waterways: true,
+  tradeRoutes: false,
+  pipelines: true,
+  commodityPorts: true,
+  storageFacilities: false,
+  fuelShortages: false,
+  sanctions: false,
+  iranAttacks: true,
+  conflicts: true,
+  ucdpEvents: false,
+  gpsJamming: false,
+  hotspots: false,
+  military: false,
+  bases: false,
+  flights: false,
+  cables: false,
+  natural: true,
+  weather: false,
+  fires: false,
+  climate: false,
+  outages: false,
+  cyberThreats: false,
+  ciiChoropleth: false,
+  minerals: false,
+  satellites: false,
+  nuclear: false,
+  irradiators: false,
+  economic: false,
+  datacenters: false,
+  protests: false,
+  spaceports: false,
+  displacement: false,
+  startupHubs: false,
+  cloudRegions: false,
+  accelerators: false,
+  techHQs: false,
+  techEvents: false,
+  stockExchanges: false,
+  financialCenters: false,
+  centralBanks: false,
+  commodityHubs: false,
+  gulfInvestments: false,
+  positiveEvents: false,
+  kindness: false,
+  happiness: false,
+  speciesRecovery: false,
+  renewableInstallations: false,
+  resilienceScore: false,
+  dayNight: false,
+  miningSites: false,
+  processingPlants: false,
+  webcams: false,
+  diseaseOutbreaks: false,
+};
+
+// ============================================
 // UNIFIED PANEL REGISTRY
 // ============================================
 
@@ -1093,6 +1259,7 @@ export const ALL_PANELS: Record<string, PanelConfig> = {
   ...HAPPY_PANELS,
   ...COMMODITY_PANELS,
   ...ENERGY_PANELS,
+  ...GEOPOLJP_PANELS,
   ...TECH_PANELS,
   ...FINANCE_PANELS,
   ...FULL_PANELS,
@@ -1100,12 +1267,13 @@ export const ALL_PANELS: Record<string, PanelConfig> = {
 
 /** Per-variant canonical panel order (keys = which panels are enabled by default). */
 export const VARIANT_DEFAULTS: Record<string, string[]> = {
-  full:      Object.keys(FULL_PANELS),
-  tech:      Object.keys(TECH_PANELS),
-  finance:   Object.keys(FINANCE_PANELS),
-  commodity: Object.keys(COMMODITY_PANELS),
-  energy:    Object.keys(ENERGY_PANELS),
-  happy:     Object.keys(HAPPY_PANELS),
+  full:        Object.keys(FULL_PANELS),
+  tech:        Object.keys(TECH_PANELS),
+  finance:     Object.keys(FINANCE_PANELS),
+  commodity:   Object.keys(COMMODITY_PANELS),
+  energy:      Object.keys(ENERGY_PANELS),
+  happy:       Object.keys(HAPPY_PANELS),
+  'geopol-jp': Object.keys(GEOPOLJP_PANELS),
 };
 
 /**
@@ -1132,6 +1300,12 @@ export const VARIANT_PANEL_OVERRIDES: Partial<Record<string, Partial<Record<stri
     map:         { name: 'Energy Atlas Map' },
     'live-news': { name: 'Energy Headlines' },
     insights:    { name: 'AI Energy Insights' },
+  },
+  'geopol-jp': {
+    map:         { name: '地政学マップ' },
+    'live-news': { name: '地政学ヘッドライン' },
+    insights:    { name: 'AI地政学インサイト' },
+    markets:     { name: '市場 & 為替' },
   },
   happy: {
     map:         { name: 'World Map' },
@@ -1189,7 +1363,9 @@ export const DEFAULT_MAP_LAYERS = SITE_VARIANT === 'happy'
         ? COMMODITY_MAP_LAYERS
         : SITE_VARIANT === 'energy'
           ? ENERGY_MAP_LAYERS
-          : FULL_MAP_LAYERS;
+          : SITE_VARIANT === 'geopol-jp'
+            ? GEOPOLJP_MAP_LAYERS
+            : FULL_MAP_LAYERS;
 
 export const MOBILE_DEFAULT_MAP_LAYERS = SITE_VARIANT === 'happy'
   ? HAPPY_MOBILE_MAP_LAYERS
@@ -1201,7 +1377,9 @@ export const MOBILE_DEFAULT_MAP_LAYERS = SITE_VARIANT === 'happy'
         ? COMMODITY_MOBILE_MAP_LAYERS
         : SITE_VARIANT === 'energy'
           ? ENERGY_MOBILE_MAP_LAYERS
-          : FULL_MOBILE_MAP_LAYERS;
+          : SITE_VARIANT === 'geopol-jp'
+            ? GEOPOLJP_MOBILE_MAP_LAYERS
+            : FULL_MOBILE_MAP_LAYERS;
 
 /** Maps map-layer toggle keys to their data-freshness source IDs (single source of truth). */
 export const LAYER_TO_SOURCE: Partial<Record<keyof MapLayers, DataSourceId[]>> = {

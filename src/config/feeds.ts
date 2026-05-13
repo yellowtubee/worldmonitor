@@ -923,6 +923,88 @@ const ENERGY_FEEDS: Record<string, Feed[]> = {
   ],
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GEOPOL-JP VARIANT FEEDS — Japan-perspective: jp-language sources + bilateral
+// focused queries (JP-US / JP-CN / US-CN), energy/Hormuz, and Asian context.
+// Categories map to the panel keys in GEOPOLJP_PANELS.
+// ─────────────────────────────────────────────────────────────────────────────
+const GEOPOLJP_FEEDS: Record<string, Feed[]> = {
+  'live-news': [
+    // Japanese mainstream wire / public broadcaster
+    { name: 'NHK 主要ニュース', url: rss('https://www3.nhk.or.jp/rss/news/cat0.xml'), lang: 'ja' },
+    { name: 'NHK 国際', url: rss('https://www3.nhk.or.jp/rss/news/cat6.xml'), lang: 'ja' },
+    { name: 'NHK 政治', url: rss('https://www3.nhk.or.jp/rss/news/cat4.xml'), lang: 'ja' },
+    { name: 'NHK ビジネス', url: rss('https://www3.nhk.or.jp/rss/news/cat5.xml'), lang: 'ja' },
+    { name: '日経 (Google経由)', url: rss('https://news.google.com/rss/search?q=site:nikkei.com+when:1d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '朝日新聞 ヘッドライン', url: rss('https://www.asahi.com/rss/asahi/newsheadlines.rdf'), lang: 'ja' },
+    { name: '朝日 政治', url: rss('https://www.asahi.com/rss/asahi/politics.rdf'), lang: 'ja' },
+    { name: '朝日 国際', url: rss('https://www.asahi.com/rss/asahi/international.rdf'), lang: 'ja' },
+    { name: '産経 (Google経由)', url: rss('https://news.google.com/rss/search?q=site:sankei.com+when:1d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '共同通信 (Google経由)', url: rss('https://news.google.com/rss/search?q=site:nordot.app+OR+site:kyodonews.net+when:1d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: 'NHK World (EN)', url: rss('https://www3.nhk.or.jp/nhkworld/en/news/feeds/news.xml') },
+    { name: 'Nikkei Asia', url: rss('https://news.google.com/rss/search?q=site:asia.nikkei.com+when:3d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Japan Times', url: rss('https://news.google.com/rss/search?q=site:japantimes.co.jp+when:2d&hl=en-US&gl=US&ceid=US:en') },
+  ],
+  // ④ US-focused news (mix EN + JA from JP press on US topics)
+  us: [
+    { name: 'Reuters US', url: rss('https://news.google.com/rss/search?q=site:reuters.com+(US+OR+Washington+OR+Biden+OR+Trump)+when:1d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'AP US', url: rss('https://news.google.com/rss/search?q=site:apnews.com+US+when:1d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Politico', url: rss('https://www.politico.com/rss/politicopicks.xml') },
+    { name: 'The Hill', url: rss('https://thehill.com/feed/') },
+    { name: 'NHK アメリカ動向', url: rss('https://news.google.com/rss/search?q=site:nhk.or.jp+(アメリカ+OR+米国+OR+ワシントン)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '日経 米国動向', url: rss('https://news.google.com/rss/search?q=site:nikkei.com+(米国+OR+アメリカ+OR+トランプ+OR+バイデン)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '日米関係', url: rss('https://news.google.com/rss/search?q=(日米同盟+OR+日米首脳+OR+"日米2+2"+OR+在日米軍)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+  ],
+  // ⑤⑥ Asia/China/Korea news (JA + EN)
+  asia: [
+    { name: 'NHK 中国', url: rss('https://news.google.com/rss/search?q=site:nhk.or.jp+(中国+OR+北京+OR+習近平)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: 'NHK 韓国・北朝鮮', url: rss('https://news.google.com/rss/search?q=site:nhk.or.jp+(韓国+OR+北朝鮮)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '日中関係', url: rss('https://news.google.com/rss/search?q=(日中関係+OR+日中首脳+OR+尖閣諸島+OR+台湾有事)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '米中関係', url: rss('https://news.google.com/rss/search?q=(米中関係+OR+米中対立+OR+台湾海峡+OR+南シナ海)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: 'The Diplomat', url: rss('https://thediplomat.com/feed/') },
+    { name: 'South China Morning Post', url: railwayRss('https://www.scmp.com/rss/91/feed/') },
+    { name: 'Reuters Asia', url: rss('https://news.google.com/rss/search?q=site:reuters.com+(China+OR+Japan+OR+Taiwan+OR+Korea)+when:3d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Nikkei Asia', url: rss('https://news.google.com/rss/search?q=site:asia.nikkei.com+when:3d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Xinhua', url: rss('https://news.google.com/rss/search?q=site:xinhuanet.com+OR+Xinhua+when:1d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'CNA', url: rss('https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml') },
+  ],
+  // ① Middle East / Iran (mix EN + JA)
+  middleeast: [
+    { name: 'NHK 中東', url: rss('https://news.google.com/rss/search?q=site:nhk.or.jp+(イラン+OR+中東+OR+イスラエル+OR+ガザ+OR+ホルムズ)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '日経 中東', url: rss('https://news.google.com/rss/search?q=site:nikkei.com+(イラン+OR+中東+OR+原油+OR+OPEC)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: 'BBC Middle East', url: rss('https://feeds.bbci.co.uk/news/world/middle_east/rss.xml') },
+    { name: 'Al Jazeera', url: rss('https://www.aljazeera.com/xml/rss/all.xml') },
+    { name: 'Iran International', url: rss('https://www.iranintl.com/en/rss.xml') },
+    { name: 'Times of Israel', url: rss('https://www.timesofisrael.com/feed/') },
+    { name: 'Jerusalem Post', url: rss('https://www.jpost.com/rss/rssfeedsfrontpage.aspx') },
+    { name: 'Asharq News', url: rss('https://news.google.com/rss/search?q=site:asharq.com+when:2d&hl=en-US&gl=US&ceid=US:en') },
+  ],
+  // ① Energy (mix EN + JA)
+  energy: [
+    { name: 'OilPrice.com', url: rss('https://oilprice.com/rss/main') },
+    { name: 'Rigzone', url: rss('https://www.rigzone.com/news/rss/rigzone_latest.aspx') },
+    { name: 'Reuters Energy', url: rss('https://news.google.com/rss/search?q=site:reuters.com+(oil+OR+gas+OR+energy+OR+OPEC)+when:1d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'OPEC & Crude', url: rss('https://news.google.com/rss/search?q=(OPEC+OR+"oil+price"+OR+"crude+oil"+OR+WTI+OR+Brent)+when:1d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Pipelines & Chokepoints', url: rss('https://news.google.com/rss/search?q=(pipeline+OR+"Strait+of+Hormuz"+OR+"Bab+el-Mandeb"+OR+"Suez+Canal")+when:2d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Tanker & Shipping', url: rss('https://news.google.com/rss/search?q=(tanker+OR+VLCC+OR+"oil+shipping"+OR+"LNG+carrier"+OR+"shadow+fleet")+when:2d&hl=en-US&gl=US&ceid=US:en') },
+    { name: '日経 エネルギー', url: rss('https://news.google.com/rss/search?q=site:nikkei.com+(原油+OR+LNG+OR+天然ガス+OR+エネルギー+OR+OPEC)+when:2d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '石油タンカー・ホルムズ', url: rss('https://news.google.com/rss/search?q=(ホルムズ海峡+OR+タンカー+OR+原油輸送+OR+船籍)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+  ],
+  // ④⑤⑥ Trade policy & sanctions (relevant to bilateral)
+  'trade-policy': [
+    { name: '日経 通商政策', url: rss('https://news.google.com/rss/search?q=site:nikkei.com+(関税+OR+通商+OR+貿易摩擦+OR+WTO)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: '米中通商', url: rss('https://news.google.com/rss/search?q=(米中貿易+OR+対中関税+OR+半導体規制+OR+輸出管理)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+    { name: 'Reuters Trade', url: rss('https://news.google.com/rss/search?q=site:reuters.com+(tariff+OR+trade+OR+sanctions+OR+"export+controls")+when:2d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Politico Trade', url: rss('https://news.google.com/rss/search?q=site:politico.com+(tariff+OR+trade+OR+sanctions)+when:2d&hl=en-US&gl=US&ceid=US:en') },
+  ],
+  // Supply chain / chokepoints (for ① context)
+  'supply-chain': [
+    { name: 'Strategic Chokepoints', url: rss('https://news.google.com/rss/search?q=("Strait+of+Hormuz"+OR+"Strait+of+Malacca"+OR+"Bab+el-Mandeb"+OR+"Suez+Canal"+OR+"Panama+Canal")+when:2d&hl=en-US&gl=US&ceid=US:en') },
+    { name: 'Energy Sanctions', url: rss('https://news.google.com/rss/search?q=("oil+sanctions"+OR+"gas+sanctions"+OR+"price+cap"+OR+"energy+embargo")+when:3d&hl=en-US&gl=US&ceid=US:en') },
+    { name: '日本のサプライチェーン', url: rss('https://news.google.com/rss/search?q=(サプライチェーン+OR+経済安全保障+OR+半導体+OR+レアアース)+when:3d&hl=ja&gl=JP&ceid=JP:ja'), lang: 'ja' },
+  ],
+};
+
 // Variant-aware exports
 export const FEEDS = SITE_VARIANT === 'tech'
   ? TECH_FEEDS
@@ -934,7 +1016,9 @@ export const FEEDS = SITE_VARIANT === 'tech'
         ? COMMODITY_FEEDS
         : SITE_VARIANT === 'energy'
           ? ENERGY_FEEDS
-          : FULL_FEEDS;
+          : SITE_VARIANT === 'geopol-jp'
+            ? GEOPOLJP_FEEDS
+            : FULL_FEEDS;
 
 export const SOURCE_REGION_MAP: Record<string, { labelKey: string; feedKeys: string[] }> = {
   // Full (geopolitical) variant regions

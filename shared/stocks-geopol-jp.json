@@ -1,0 +1,64 @@
+{
+  "_comment": "Stocks config for the geopol-jp variant. Superset of shared/stocks.json: keeps the global core (used by the global Markets panel) and adds Japanese oil equities, JP indices, key JP FX pairs, and additional global oil majors relevant to SHINJI's 6 requirements (② oil equities, ③ FX).",
+  "symbols": [
+    { "symbol": "^GSPC", "name": "S&P 500", "display": "SPX" },
+    { "symbol": "^DJI", "name": "Dow Jones", "display": "DOW" },
+    { "symbol": "^IXIC", "name": "NASDAQ", "display": "NDX" },
+
+    { "symbol": "^N225", "name": "日経平均株価 (Nikkei 225)", "display": "N225" },
+    { "symbol": "^TPX", "name": "TOPIX", "display": "TOPIX" },
+    { "symbol": "^HSI", "name": "Hang Seng", "display": "HSI" },
+    { "symbol": "000001.SS", "name": "上海総合指数", "display": "SHCOMP" },
+
+    { "symbol": "USDJPY=X", "name": "ドル/円", "display": "USDJPY" },
+    { "symbol": "EURJPY=X", "name": "ユーロ/円", "display": "EURJPY" },
+    { "symbol": "CNYJPY=X", "name": "人民元/円", "display": "CNYJPY" },
+    { "symbol": "GBPJPY=X", "name": "ポンド/円", "display": "GBPJPY" },
+    { "symbol": "AUDJPY=X", "name": "豪ドル/円", "display": "AUDJPY" },
+    { "symbol": "DX-Y.NYB", "name": "ドル指数 (DXY)", "display": "DXY" },
+
+    { "symbol": "1605.T", "name": "INPEX", "display": "INPEX" },
+    { "symbol": "5020.T", "name": "ENEOSホールディングス", "display": "ENEOS" },
+    { "symbol": "5019.T", "name": "出光興産", "display": "IDEMITSU" },
+    { "symbol": "5021.T", "name": "コスモエネルギーホールディングス", "display": "COSMO" },
+    { "symbol": "1662.T", "name": "石油資源開発 (JAPEX)", "display": "JAPEX" },
+    { "symbol": "9531.T", "name": "東京ガス", "display": "TKYGAS" },
+    { "symbol": "9532.T", "name": "大阪ガス", "display": "OSKGAS" },
+
+    { "symbol": "8001.T", "name": "伊藤忠商事", "display": "ITOCHU" },
+    { "symbol": "8002.T", "name": "丸紅", "display": "MARUBENI" },
+    { "symbol": "8031.T", "name": "三井物産", "display": "MITSUI" },
+    { "symbol": "8053.T", "name": "住友商事", "display": "SUMITOMO" },
+    { "symbol": "8058.T", "name": "三菱商事", "display": "MITSUBISHI" },
+
+    { "symbol": "XOM", "name": "ExxonMobil", "display": "XOM" },
+    { "symbol": "CVX", "name": "Chevron", "display": "CVX" },
+    { "symbol": "SHEL", "name": "Shell", "display": "SHEL" },
+    { "symbol": "BP", "name": "BP", "display": "BP" },
+    { "symbol": "COP", "name": "ConocoPhillips", "display": "COP" },
+    { "symbol": "TTE", "name": "TotalEnergies", "display": "TTE" },
+    { "symbol": "OXY", "name": "Occidental Petroleum", "display": "OXY" },
+    { "symbol": "EOG", "name": "EOG Resources", "display": "EOG" },
+    { "symbol": "SLB", "name": "Schlumberger", "display": "SLB" },
+
+    { "symbol": "AAPL", "name": "Apple", "display": "AAPL" },
+    { "symbol": "MSFT", "name": "Microsoft", "display": "MSFT" },
+    { "symbol": "NVDA", "name": "NVIDIA", "display": "NVDA" },
+    { "symbol": "GOOGL", "name": "Alphabet", "display": "GOOGL" },
+    { "symbol": "AMZN", "name": "Amazon", "display": "AMZN" },
+    { "symbol": "META", "name": "Meta", "display": "META" },
+    { "symbol": "TSM", "name": "TSMC", "display": "TSM" },
+    { "symbol": "TSLA", "name": "Tesla", "display": "TSLA" },
+    { "symbol": "AVGO", "name": "Broadcom", "display": "AVGO" },
+    { "symbol": "JPM", "name": "JPMorgan", "display": "JPM" },
+    { "symbol": "BAC", "name": "BofA", "display": "BAC" }
+  ],
+  "yahooOnly": [
+    "^GSPC", "^DJI", "^IXIC",
+    "^N225", "^TPX", "^HSI", "000001.SS",
+    "USDJPY=X", "EURJPY=X", "CNYJPY=X", "GBPJPY=X", "AUDJPY=X", "DX-Y.NYB",
+    "1605.T", "5020.T", "5019.T", "5021.T", "1662.T",
+    "9531.T", "9532.T",
+    "8001.T", "8002.T", "8031.T", "8053.T", "8058.T"
+  ]
+}
